@@ -42,9 +42,33 @@ const jobs = [{
 //Template engines
 //5 = trocamos o sendFile = enviar por render = renderizar
 //Aula2/4 = Adicionar o objeto jobs na index
-routes.get('/', (req, res) => res.render(basePath + "index", {
-    jobs
-}))
+routes.get('/', (req, res) => {
+
+    //Aula2/5 = Criar um novo array atualizado de jobs
+    const updatedJobs = jobs.map((job) => {
+        //Aula2/5= Ajuste no job
+        //Aula2/5= Calculo de tempo restante, remaningDays(dias restantes para entrega do projeto)
+        //Aula2/5= toFixed() = receber numeros inteiros "arredondar"
+        const remaningDays = (job["total-hours"] / job["daily-hours"]).toFixed()
+        //Aula2/5= criar uma varivel que retorne um objeto que contenha a data de criação do projetos
+        const createdDate = new Date(job.created_at)
+        //Aula2/5= definir dia do vencimento do projetos
+        const dueDay = createdDate.getDay() + Number(remaningDays)
+        //Aula2/5= definir data do vencimento do projetos
+        // const dueDate = createdDate.setDate
+
+
+        return job
+    })
+
+
+
+
+
+    return res.render(basePath + "index", {
+        jobs
+    })
+})
 routes.get('/job', (req, res) => res.render(basePath + "job"))
 routes.post('/job', (req, res) => {
     //=============================================================================================================================== = Aula2/3
@@ -91,6 +115,9 @@ routes.get('/profile', (req, res) => res.render(basePath + "profile", {
 //Aula2/4 = Adicionar create_AT = Date.now() em jobs.push()
 //Aula2/4 = Vamos criar uma maneira de adicionarmos uma id para cada job adicionado no app, vamos suar futuramente para gerenciar esse dado
 //Aula2/4 = Vamos criar um forEach para automatizarmos a criação de cards(ir para index.ejs)
+//=============================================================================================================================== = Aula2/4
+//Aula2/5 = Vamos criuar a função Remaining Caulculator, calcular quantos dias faltam para o dia da entrega do projeto
+
 
 //10 = criamos uma funcionalidade get igual que temos no server.js e substituimos pela varivel routes
 //routes.get('/', (req, res) => {

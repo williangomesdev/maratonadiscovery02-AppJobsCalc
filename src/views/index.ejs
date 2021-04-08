@@ -80,10 +80,10 @@
       <div class="cards">
         <!-- Aula2/4= para cada(forEach) item vamos rodar uma função-->
         <% jobs.forEach((job)=>{%>
-        <div class="card progress" data-id="1">
-          <div class="id column">1</div>
+        <div class="card progress" data-id="<%= job.id %> ">
+          <div class="id column"><%= job.id %> </div>
           <div class="name column">
-            <%= jobs[0].name %>
+            <%= job.name %>
           </div>
           <div class="deadline column">
             <span>Prazo</span>
