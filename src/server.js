@@ -31,7 +31,7 @@ const routes = require("./routes")
 
 //Template Engines
 //1 = setar o motor de visualização seje o ejs. o ejs vai fazer o processamento do html analisando dentro do contexto <% %> o javascript, e depois entregando o html puro
-server.set("view engine","ejs")
+server.set("view engine", "ejs")
 //Template Engines
 //2 = trocar todos os arquivos com extensão html para ejs
 
@@ -46,9 +46,19 @@ server.set("view engine","ejs")
 
 
 
-
-
 //=============================================================================================================================== = 3
+
+
+
+//=============================================================================================================================== = Aula2/2
+//Aula2/2 = temos que adicionar uma linha de comando para o req.body liberar as informações, habilitar a funcionalidade de pegar as informações do corpo
+//Aula2/2 = .use(), configura, adiciona, setar, habilitar
+//Aula2/2 = express.encoded() =  função do express que identifica dados codificados, que vai permitir a leitura do corpo(extend:true)
+server.use(express.urlencoded({
+    extended: true
+}))
+//=============================================================================================================================== = Aula2/2
+
 //10 = agora vamos as rotas que nos requisitamos adicionanado como um parametro use()
 server.use(routes)
 
@@ -63,22 +73,22 @@ server.use(express.static("public"))
 
 //server.get('/', (request, response) => {
 
-    //6 = Terminar a função(precisa receber resposta) = return
-    //4 = response.send = send envia alguma coisa
+//6 = Terminar a função(precisa receber resposta) = return
+//4 = response.send = send envia alguma coisa
 
-    //return response.send("3 = OI!");
+//return response.send("3 = OI!");
 
-    //8 = sendFile() = enviará um arquivo, colocamos o caminho par ao nosso servidor buscar e servir
-    //para rastraemos o arquivo temos que deixar o arquivo em um caminho absoluto(consultar o caminho com o console.lo(__dirname))
-    //8 = Vamos criar um diretório dento da pasta src com o nome de views, jogar tudo aquilo que o cliente for visualizar(html)
-    //8 = Agora concatenamos o dirname(que será o nosso  caminho absoluto), junto com a pasta views(onde estão os nossos arquivos html) e retornaremos na função sendFile
+//8 = sendFile() = enviará um arquivo, colocamos o caminho par ao nosso servidor buscar e servir
+//para rastraemos o arquivo temos que deixar o arquivo em um caminho absoluto(consultar o caminho com o console.lo(__dirname))
+//8 = Vamos criar um diretório dento da pasta src com o nome de views, jogar tudo aquilo que o cliente for visualizar(html)
+//8 = Agora concatenamos o dirname(que será o nosso  caminho absoluto), junto com a pasta views(onde estão os nossos arquivos html) e retornaremos na função sendFile
 
-    //return response.sendFile(__dirname+"/views/index.html")
+//return response.sendFile(__dirname+"/views/index.html")
 
-    //9 = Public directory, arquivos que fazem parte do html para ter um bom funcionamento(CSS, javascript, etc...(são arquivos que não tem muitas mudanças conforme o preocesso(arquos estaticos)))
-    //9 = Precisamos estabelecer rotas para que esses arquivos sejem também entregues ao cliente
-    //9 = Como normalmente usamos varios arquivos no nosso projeto, a função express tem uma maneira para automatizar a criação dessas rotas
-    //9 = Criar uma pasta para armazenar esses arquivos (/public), e vamos adicionar arquivos de imagem e CSS
+//9 = Public directory, arquivos que fazem parte do html para ter um bom funcionamento(CSS, javascript, etc...(são arquivos que não tem muitas mudanças conforme o preocesso(arquos estaticos)))
+//9 = Precisamos estabelecer rotas para que esses arquivos sejem também entregues ao cliente
+//9 = Como normalmente usamos varios arquivos no nosso projeto, a função express tem uma maneira para automatizar a criação dessas rotas
+//9 = Criar uma pasta para armazenar esses arquivos (/public), e vamos adicionar arquivos de imagem e CSS
 //})
 
 //5 = precisa desligar o servidor (CRL + C no terminal)_
@@ -89,6 +99,8 @@ server.use(express.static("public"))
 //7 = no terminal = npm run dev (rodar o script dev que configuramos no package.js)
 
 //8 = Agora temos que encaminhar(mostrar) o caminho para nossas paginas html
+
+
 
 //Propiedades
 //3= Listen = ligar o servidor ouvir requerimento da porta
