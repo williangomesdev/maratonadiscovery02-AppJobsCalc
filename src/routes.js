@@ -20,7 +20,19 @@ const profile = {
 }
 
 //=============================================================================================================================== = Aula2/3
-const jobs = []
+const jobs = [{
+    id: 1,
+    name: "Pizzaria Guloso",
+    "daily-hours": 2,
+    "total-hours": 60,
+    created_at: Date.now()
+}, {
+    id: 2,
+    name: "OneTwo Project",
+    "daily-hours": 3,
+    "total-hours": 55,
+    created_at: Date.now()
+}]
 //=============================================================================================================================== = Aula2/3
 
 //11 = Encurtando a digitação das rotas
@@ -29,20 +41,25 @@ const jobs = []
 //4 = Antes entregavamos as paginas com html puro, agora vamos mudar para ele passar pelo motor(render) = ejs=================== = (Template engines)4
 //Template engines
 //5 = trocamos o sendFile = enviar por render = renderizar
-routes.get('/', (req, res) => res.render(basePath + "index"))
+//Aula2/4 = Adicionar o objeto jobs na index
+routes.get('/', (req, res) => res.render(basePath + "index", {
+    jobs
+}))
 routes.get('/job', (req, res) => res.render(basePath + "job"))
 routes.post('/job', (req, res) => {
     //=============================================================================================================================== = Aula2/3
     //=============================================================================================================================== = Aula2/4
-    //Aula2/4 = adicionar em uma classe o indice 0 do array a partir deste começaremos a contagem e adicionar os id's
-    const jobId = jobs[0]
+    //Aula2/4 = adicionar em uma classe o indice 0 do array a partir deste começaremos a contagem e adicionar os id's, adicionamos jobs.lenght para contar os elementos do array, contudo como 0 é contado como um elemento adicionamos -1 para recebermos o numero exato do array
+    //Aula2/4 = no caso o array 0(não existe nada), se contarmos com -1 vai dar um valor inexistente, para contornarmos essa situação, vamos usar o comparador OU para 1 para começarmos a numerar os jobs 
+    const lastId = jobs[jobs.length - 1] ? jobs[jobs.length - 1].id : 1;
     //=============================================================================================================================== = Aula2/4
     jobs.push({
         //=============================================================================================================================== = Aula2/4
+        id: lastId + 1,
         name: req.body.name,
         "daily-hours": req.body["daily-hours"],
         "total-hours": req.body["totla-hours"],
-        created_At = Date.now(),
+        created_at: Date.now()
         //=============================================================================================================================== = Aula2/4
     })
     return res.redirect('/')
@@ -73,6 +90,7 @@ routes.get('/profile', (req, res) => res.render(basePath + "profile", {
 //Aula2/4 = Adicionar os parametros do array em jobs.push()
 //Aula2/4 = Adicionar create_AT = Date.now() em jobs.push()
 //Aula2/4 = Vamos criar uma maneira de adicionarmos uma id para cada job adicionado no app, vamos suar futuramente para gerenciar esse dado
+//Aula2/4 = Vamos criar um forEach para automatizarmos a criação de cards(ir para index.ejs)
 
 //10 = criamos uma funcionalidade get igual que temos no server.js e substituimos pela varivel routes
 //routes.get('/', (req, res) => {
