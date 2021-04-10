@@ -9,90 +9,171 @@ const routes = express.Router();
 
 const basePath = __dirname + "/views/"
 
+//=============================================================================================================================== = Aula2/10
+
 //Editar profile dinamicamente
-const profile = {
-    "name": "Willian",
-    "avatar": "https://github.com/williangomesdev.png",
-    "monthly-budget": 3000,
-    "hours-per-day": 5,
-    "days-per-week": 5,
-    "vacation-per-year": 4
+
+const Profile = {
+    data: {
+        "name": "Willian",
+        "avatar": "https://github.com/williangomesdev.png",
+        "monthly-budget": 3000,
+        "hours-per-day": 5,
+        "days-per-week": 5,
+        "vacation-per-year": 4,
+        "value-hour": 75
+    },
+    controllers: {
+        index(req, res) {
+            res.render(basePath + "profile", {
+                profile: Profile.data
+            })
+        },
+        //Update = Calculo de custo de horas, pegar algumas informaçoes do  Profile.data
+        update(req, res) {
+            //req.body para pegar os dados
+            const data = req.body
+            //definir quantas emana s tem no ano  
+            const weeksPerYear = 52
+            //remover as semanas de ferias do ano, para pegar quantas semanas tem em um mes
+            const weeksPerMonth = (weeksPerYear - data["vacation-per-year"]) / 12
+            //Total de horas trabalhadas por semana
+            const weekTotalHours = data["hours-per-day"] * data["days-per-week"]
+            //Total de horas trabalhadas por mês
+            const monthlyTotalHours = weekTotalHours * weeksPerMonth
+            //Qual será p valor aminha hora
+            const valueHour = data["value-hour"] = data["monthly-budget"] / monthlyTotalHours
+
+            Profile.data = {
+                ...Profile.data,
+                ...req.body,
+                "value-hour": valueHour
+            }
+            return res.redirect('/profile')
+        }
+    }
 }
+//=============================================================================================================================== = Aula2/10
 
-//=============================================================================================================================== = Aula2/3
-const jobs = [{
-    id: 1,
-    name: "Pizzaria Guloso",
-    "daily-hours": 2,
-    "total-hours": 60,
-    created_at: Date.now()
-}, {
-    id: 2,
-    name: "OneTwo Project",
-    "daily-hours": 3,
-    "total-hours": 55,
-    created_at: Date.now()
-}]
-//=============================================================================================================================== = Aula2/3
+//=============================================================================================================================== = Aula2/9
+//Object literals = ja adiciona as suas propiedades
+//Controllers =  controlar as funçoes de dentro do objeto
+const Job = {
+    data: [
+        //=============================================================================================================================== = Aula2/3
+        {
+            id: 1,
+            name: "Pizzaria Guloso",
+            "daily-hours": 2,
+            "total-hours": 1,
+            created_at: Date.now()
+        },
+        {
+            id: 2,
+            name: "OneTwo Project",
+            "daily-hours": 3,
+            "total-hours": 55,
+            created_at: Date.now()
+        }
 
+        //=============================================================================================================================== = Aula2/3
+    ],
+    controllers: {
+        index(req, res) {
+
+
+            //Aula2/5 = Criar um novo array atualizado de jobs
+            const updatedJobs = Job.data.map((job) => {
+
+                const remaining = Job.services.remainingDays(job)
+                //If ternario = se remaining for < = 0  (?)faça (:)senão faça
+                const status = remaining <= 0 ? 'done' : 'progress'
+
+
+                //Espalhamento = ...(pegue tudo que tenha no objeto e coloque aqui dentro)
+                return {
+                    ...job,
+                    remaining,
+                    status,
+                    //Aula2/6 = Caluculo do custo do projeto
+                    budget: Profile.data["value-hour"] * job["total-hours"]
+                }
+            })
+
+            //Informações que serão retornadas no HTML
+            return res.render(basePath + "index", {
+                jobs: updatedJobs
+            })
+        },
+        create(req, res) {
+            return res.render(basePath + "job")
+        },
+        save(req, res) {
+            //Aula2/4 = Adicionar o objeto jobs na index
+            //=============================================================================================================================== = Aula2/3
+            //=============================================================================================================================== = Aula2/4
+            //Aula2/4 = adicionar em uma classe o indice 0 do array a partir deste começaremos a contagem e adicionar os id's, adicionamos jobs.lenght para contar os elementos do array, contudo como 0 é contado como um elemento adicionamos -1 para recebermos o numero exato do array
+            //Aula2/4 = no caso o array 0(não existe nada), se contarmos com -1 vai dar um valor inexistente, para contornarmos essa situação, vamos usar o comparador OU para 1 para começarmos a numerar os jobs 
+            const lastId = Job.data[Job.data.length - 1] ? Job.data[Job.data.length - 1].id : 1;
+            //=============================================================================================================================== = Aula2/4
+            Job.data.push({
+                //=============================================================================================================================== = Aula2/4
+                id: lastId + 1,
+                name: req.body.name,
+                "daily-hours": req.body["daily-hours"],
+                "total-hours": req.body["totla-hours"],
+                created_at: Date.now()
+                //=============================================================================================================================== = Aula2/4
+            })
+            return res.redirect('/')
+            //=============================================================================================================================== = Aula2/3
+        },
+
+    },
+    services: {
+        //Aula2/5 = criar função de dias faltantes
+        remainingDays(job) {
+            //Aula2/5= Ajuste no job
+            //Aula2/5= Calculo de tempo restante, remaningDays(dias restantes para entrega do projeto)
+            //Aula2/5= toFixed() = receber numeros inteiros "arredondar"
+            const remainingDays = (job['total-hours'] / job['daily-hours']).toFixed();
+            //Aula2/5= criar uma varivel que retorne um objeto que contenha a data de criação do projetos
+            const createdDate = new Date(job.created_at)
+            //Aula2/5= definir dia do vencimento do projetos
+            const dueDay = createdDate.getDate() + Number(remainingDays)
+            //Aula2/5= definir data do vencim   ento do projetos
+            const dueDateInMs = createdDate.setDate(dueDay)
+            //Aula2/5= Retirar  da data futura os dias que temos a partir de hoje
+            const timeDiffInMs = dueDateInMs - Date.now()
+            //Aula2/5= Transformar Ms em dias
+            const dayInMs = 1000 * 60 * 60 * 24
+            //Aula2/5= Math.floor = arredondando para baixo
+            const dayDiff = Math.floor(timeDiffInMs / dayInMs)
+            //X dias faltantes
+            return dayDiff
+
+        }
+    }
+}
+//=============================================================================================================================== = Aula2/9
 //11 = Encurtando a digitação das rotas
 //11 = Arrow function => com uma linha não precisamos usar return
 //=============================================================================================================================== = (Template engines)4
 //4 = Antes entregavamos as paginas com html puro, agora vamos mudar para ele passar pelo motor(render) = ejs=================== = (Template engines)4
 //Template engines
 //5 = trocamos o sendFile = enviar por render = renderizar
-//Aula2/4 = Adicionar o objeto jobs na index
-routes.get('/', (req, res) => {
-
-    //Aula2/5 = Criar um novo array atualizado de jobs
-    const updatedJobs = jobs.map((job) => {
-        //Aula2/5= Ajuste no job
-        //Aula2/5= Calculo de tempo restante, remaningDays(dias restantes para entrega do projeto)
-        //Aula2/5= toFixed() = receber numeros inteiros "arredondar"
-        const remaningDays = (job["total-hours"] / job["daily-hours"]).toFixed()
-        //Aula2/5= criar uma varivel que retorne um objeto que contenha a data de criação do projetos
-        const createdDate = new Date(job.created_at)
-        //Aula2/5= definir dia do vencimento do projetos
-        const dueDay = createdDate.getDay() + Number(remaningDays)
-        //Aula2/5= definir data do vencimento do projetos
-        // const dueDate = createdDate.setDate
 
 
-        return job
-    })
+//=============================================================================================================================== = Aula2/9
 
+routes.get('/', Job.controllers.index)
+routes.get('/job', Job.controllers.create)
+routes.post('/job', Job.controllers.save)
+//=============================================================================================================================== = Aula2/9
 
-
-
-
-    return res.render(basePath + "index", {
-        jobs
-    })
-})
-routes.get('/job', (req, res) => res.render(basePath + "job"))
-routes.post('/job', (req, res) => {
-    //=============================================================================================================================== = Aula2/3
-    //=============================================================================================================================== = Aula2/4
-    //Aula2/4 = adicionar em uma classe o indice 0 do array a partir deste começaremos a contagem e adicionar os id's, adicionamos jobs.lenght para contar os elementos do array, contudo como 0 é contado como um elemento adicionamos -1 para recebermos o numero exato do array
-    //Aula2/4 = no caso o array 0(não existe nada), se contarmos com -1 vai dar um valor inexistente, para contornarmos essa situação, vamos usar o comparador OU para 1 para começarmos a numerar os jobs 
-    const lastId = jobs[jobs.length - 1] ? jobs[jobs.length - 1].id : 1;
-    //=============================================================================================================================== = Aula2/4
-    jobs.push({
-        //=============================================================================================================================== = Aula2/4
-        id: lastId + 1,
-        name: req.body.name,
-        "daily-hours": req.body["daily-hours"],
-        "total-hours": req.body["totla-hours"],
-        created_at: Date.now()
-        //=============================================================================================================================== = Aula2/4
-    })
-    return res.redirect('/')
-    //=============================================================================================================================== = Aula2/3
-})
 routes.get('/job-edit', (req, res) => res.render(basePath + "job-edit"))
-routes.get('/profile', (req, res) => res.render(basePath + "profile", {
-    profile
-}))
+routes.get('/profile', Profile.controllers.index)
+routes.post('/profile', Profile.controllers.update)
 
 
 //12 = Agora temos que ir no html fazer a correção das rotas(vamos apra paginas html)
@@ -117,8 +198,17 @@ routes.get('/profile', (req, res) => res.render(basePath + "profile", {
 //Aula2/4 = Vamos criar um forEach para automatizarmos a criação de cards(ir para index.ejs)
 //=============================================================================================================================== = Aula2/4
 //Aula2/5 = Vamos criuar a função Remaining Caulculator, calcular quantos dias faltam para o dia da entrega do projeto
-
-
+//=============================================================================================================================== = Aula2/5
+//Aula 2/6 = Vamos criar a função para calclo valor hora
+//=============================================================================================================================== = Aula2/6
+//Aula 2/7 = Adicionar informações no HTML(ir para index.ejs)
+//=============================================================================================================================== = Aula2/7
+//Aula 2/8 = Adicionar uma entrada no jobs para prazo encerrado(ir para index.ejs)
+//=============================================================================================================================== = Aula2/8
+//Aula 2/9 = Refatorar jobs 
+//=============================================================================================================================== = Aula2/9
+//Aula 2/10 = Refatorar Profile 
+//=============================================================================================================================== = Aula2/10
 //10 = criamos uma funcionalidade get igual que temos no server.js e substituimos pela varivel routes
 //routes.get('/', (req, res) => {
 //    return res.sendFile(__dirname+"/views/index.html")
